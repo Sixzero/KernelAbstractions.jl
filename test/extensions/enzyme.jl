@@ -10,7 +10,6 @@ end
 function square_caller(A, backend)
     kernel = square!(backend)
     kernel(A, ndrange=size(A))
-    KernelAbstractions.synchronize(backend)
 end
 
 
@@ -52,6 +51,7 @@ function enzyme_testsuite(backend, ArrayT, supports_reverse=true)
         dA .= 1
 
         Enzyme.autodiff(Forward, square_caller, Duplicated(A, dA), Const(backend()))
+        KernelAbstractions.synchronize(backend())
         @test all(dA .≈ 2:2:128)
 
     end
